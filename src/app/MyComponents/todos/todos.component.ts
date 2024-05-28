@@ -8,8 +8,7 @@ import { AddTodoComponent } from "../add-todo/add-todo.component";
     selector: 'app-todos',
     standalone: true,
     templateUrl: './todos.component.html',
-    styleUrls: ['./todos.component.css'] // Corrected here
-    ,
+    styleUrls: ['./todos.component.css'], // Corrected here
     imports: [CommonModule, TodoItemComponent, AddTodoComponent]
 })
 
