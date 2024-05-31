@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, Inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { CommonModule } from '@angular/common';
 import { Todo } from '../../Todo';
 import { TodoItemComponent } from "../todo-item/todo-item.component";
@@ -8,27 +9,42 @@ import { AddTodoComponent } from "../add-todo/add-todo.component";
     selector: 'app-todos',
     standalone: true,
     templateUrl: './todos.component.html',
-    styleUrls: ['./todos.component.css'], // Corrected here
+    styleUrls: ['./todos.component.css'],
     imports: [CommonModule, TodoItemComponent, AddTodoComponent]
 })
-
 export class TodosComponent {
-  todos: Todo[];
+  localItem: string | null;
+  todos: Todo[] = [];
 
-  constructor() {
-    this.todos = [
-      { sno: 1, title: "hello 1", desc: "how are you 1", active: true },
-      { sno: 2, title: "hello 2", desc: "how are you 2", active: true },
-      { sno: 3, title: "hello 3", desc: "how are you 3", active: true }
-    ];
+  constructor(@Inject(PLATFORM_ID) private platformId: Object) {
+    if (isPlatformBrowser(this.platformId)) {
+      this.localItem = localStorage.getItem("todos");
+      if (this.localItem) {
+        this.todos = JSON.parse(this.localItem);
+      }
+    } else {
+      this.localItem = null;
+    }
   }
-  deleteTodo(todo:Todo){
+
+  deleteTodo(todo: Todo) {
     console.log(todo);
     const index = this.todos.indexOf(todo);
-    this.todos.splice(index,1);
+    if (index > -1) {
+      this.todos.splice(index, 1);
+      this.updateLocalStorage();
+    }
   }
-  addTodo(todo:Todo){
+
+  addTodo(todo: Todo) {
     console.log(todo);
     this.todos.push(todo);
+    this.updateLocalStorage();
+  }
+
+  private updateLocalStorage() {
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.setItem("todos", JSON.stringify(this.todos));
+    }
   }
 }
